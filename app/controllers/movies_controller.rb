@@ -7,9 +7,28 @@ class MoviesController < ApplicationController
   end
 
   def index
-    @ratings_to_show = Movie.parse_ratings(params[:ratings])
-    @movies = Movie.with_ratings(@ratings_to_show)
+    sort = params[:sort] || session[:sort]
+    
+    case sort
+    when 'title'
+      order = {:title => :asc}
+      @title_class = 'bg-warning hilite'
+    when 'release_date'
+      order = {:release_date => :asc}
+      @release_date_class = 'bg-warning hilite'
+    end
+    
     @all_ratings = Movie.all_ratings
+    @ratings_to_show = params[:ratings] || @all_ratings.zip(Array.new(@all_ratings.size, 1)).to_h
+    
+    if params[:sort] != session[:sort] or params[:ratings] != session[:ratings]
+      session[:sort] = sort
+      session[:ratings] = @ratings_to_show
+      redirect_to :sort => sort, :ratings => @ratings_to_show
+      return
+    end
+    
+    @movies = Movie.with_ratings(@ratings_to_show, order)
   end
 
   def new
