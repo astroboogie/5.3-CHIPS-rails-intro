@@ -19,7 +19,7 @@ class MoviesController < ApplicationController
     end
     
     @all_ratings = Movie.all_ratings
-    @ratings_to_show = params[:ratings] || @all_ratings.zip(Array.new(@all_ratings.size, 1)).to_h
+    @ratings_to_show = params[:ratings] || session[:ratings] || @all_ratings.zip(Array.new(@all_ratings.size, 1)).to_h
     
     if params[:sort] != session[:sort] or params[:ratings] != session[:ratings]
       session[:sort] = sort
